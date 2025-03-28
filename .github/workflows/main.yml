@@ -1,0 +1,44 @@
+name: Unzip Proxy Checker
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      extract_dir:
+        description: 'Directory to extract to'
+        required: false
+        default: 'proxy-checker'
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Unzip proxy-checker.zip
+      run: |
+        # Set zip file name
+        ZIP_FILE="proxy-checker.zip"
+        
+        # Set extraction directory (use input or default)
+        EXTRACT_DIR="${{ github.event.inputs.extract_dir || 'proxy-checker' }}"
+        
+        # Create extraction directory
+        mkdir -p "$EXTRACT_DIR"
+        
+        # Check if zip file exists
+        if [ -f "$ZIP_FILE" ]; then
+          echo "Extracting $ZIP_FILE to $EXTRACT_DIR"
+          unzip -o "$ZIP_FILE" -d "$EXTRACT_DIR"
+          echo "Extraction complete!"
+          
+          # List extracted files
+          echo "Extracted files:"
+          ls -la "$EXTRACT_DIR"
+        else
+          echo "Error: $ZIP_FILE not found in repository"
+          exit 1
+        fi
